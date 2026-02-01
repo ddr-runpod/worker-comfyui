@@ -1,19 +1,24 @@
 services:
-  comfyui-worker:
-    image: runpod/worker-comfyui:dev
-    pull_policy: never
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    environment:
-      - SERVE_API_LOCALLY=true
-    ports:
-      - "8000:8000"
-      - "8188:8188"
-    volumes:
-      - ./data/comfyui/output:/comfyui/output
-      - ./data/runpod-volume:/runpod-volume
+    comfyui-worker:
+        image: registry.runpod.net/ddr-runpod-worker-comfyui-main-dockerfile
+        build:
+            dockerfile: Dockerfile
+            context: .
+        pull_policy: never
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        -   driver: nvidia
+                            count: all
+                            capabilities: [ gpu ]
+        environment:
+            - SERVE_API_LOCALLY=true
+        ports:
+            - "8000:8000"
+            - "8188:8188"
+        volumes:
+            - ./data/comfyui/output:/comfyui/output
+            - /media/data/models/huggingface.co/black-forest-labs/FLUX.2-klein-9b-fp8/flux-2-klein-9b-fp8.safetensors:/runpod-volume/models/unet/flux-2-klein-9b-fp8.safetensors
+            - /media/data/models/huggingface.co/Comfy-Org/flux2-klein-9B/qwen_3_8b_fp8mixed.safetensors:/runpod-volume/models/clip/qwen_3_8b_fp8mixed.safetensors
+            - /media/data/models/huggingface.co/Comfy-Org/flux2-dev/flux2-vae.safetensors:/runpod-volume/models/vae/flux2-vae.safetensors
